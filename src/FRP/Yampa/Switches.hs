@@ -810,9 +810,6 @@ freeze sf dt = SF {sfTF = (sfTF' sf) dt}
 freezeCol :: Functor col => col (SF' a b) -> DTime -> col (SF a b)
 freezeCol sfs dt = fmap (`freeze` dt) sfs
 
--- SF a b = Signal a -> Signal b
--- Signal alpha = Time -> alpha
-
 parC :: SF a b -> SF [a] [b]
 parC sf = SF $ \as -> let os  = map (sfTF sf) as
                           bs  = map snd os
