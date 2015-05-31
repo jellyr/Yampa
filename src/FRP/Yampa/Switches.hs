@@ -817,16 +817,21 @@ parC sf = SF $ \as -> let os  = map (sfTF sf) as
                       in (parCAux sfs, bs)
 
 -- Internal definition. Also used in parallel switchers.
-parCAux :: [SF' a b]
-        -> SF' [a] [b]
-parCAux sfs = SF' tf -- True
+parCAux :: [SF' a b] -> SF' [a] [b]
+parCAux sfs = SF' tf
     where
         tf dt as =
             let os    = map (\(a,sf) -> sfTF' sf dt a) $ safeZip "parC" as sfs
                 bs    = map snd os
                 sfcs  = map fst os
             in
-                (parCAux sfcs, bs)
+                (mapSeq sfcs `seq` parCAux sfcs, mapSeq bs)
+
+mapSeq :: [a] -> [a]
+mapSeq x = x `seq` (mapSeq' x)
+mapSeq' []     = []
+mapSeq' (a:as) = a `seq` mapSeq' as
+
 
 -- Vim modeline
 -- vim:set tabstop=8 expandtab:
