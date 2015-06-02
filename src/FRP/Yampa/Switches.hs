@@ -810,6 +810,7 @@ freeze sf dt = SF {sfTF = (sfTF' sf) dt}
 freezeCol :: Functor col => col (SF' a b) -> DTime -> col (SF a b)
 freezeCol sfs dt = fmap (`freeze` dt) sfs
 
+-- Apply an SF to every element of a list.
 parC :: SF a b -> SF [a] [b]
 parC sf = SF $ \as -> let os  = map (sfTF sf) as
                           bs  = map snd os
@@ -825,12 +826,14 @@ parCAux sfs = SF' tf
                 bs    = map snd os
                 sfcs  = map fst os
             in
-                (mapSeq sfcs `seq` parCAux sfcs, mapSeq bs)
+                (listSeq sfcs `seq` parCAux sfcs, listSeq bs)
 
-mapSeq :: [a] -> [a]
-mapSeq x = x `seq` (mapSeq' x)
-mapSeq' []     = []
-mapSeq' (a:as) = a `seq` mapSeq' as
+listSeq :: [a] -> [a]
+listSeq x = x `seq` (listSeq' x)
+
+listSeq' :: [a] -> [a]
+listSeq' []        = []
+listSeq' rs@(a:as) = a `seq` listSeq' as `seq` rs
 
 
 -- Vim modeline
