@@ -4,7 +4,7 @@
 
 module FRP.Yampa.Signal where
 
-import FRP.Yampa (DTime)
+import FRP.Yampa.InternalCore (DTime)
 
 -- ** Sources, signals and Sinks
 class Source a d m | a -> d, a -> m where

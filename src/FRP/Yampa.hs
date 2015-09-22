@@ -427,6 +427,10 @@ module FRP.Yampa (
     ( # ),                -- :: (a -> b) -> (b -> c) -> (a -> c),    infixl 9
     dup,                  -- :: a -> (a,a)
 
+    Source(..),
+    Sink(..),
+    Signal(..),
+
 ) where
 
 import Control.Arrow
@@ -443,6 +447,7 @@ import FRP.Yampa.Loop
 import FRP.Yampa.Miscellany (( # ), dup)
 import FRP.Yampa.Random
 import FRP.Yampa.Scan
+import FRP.Yampa.Signal
 import FRP.Yampa.Simulation
 import FRP.Yampa.Switches
 import FRP.Yampa.Time
