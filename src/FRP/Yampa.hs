@@ -108,7 +108,7 @@
 -- * "FRP.Yampa.Diagnostics"
 --
 -- * "FRP.Yampa.Forceable"
--- 
+--
 -- * "FRP.Yampa.Internals"  -- No longer in use
 --
 -- * "FRP.Yampa.MergeableRecord"
@@ -299,7 +299,7 @@ module FRP.Yampa (
     rMerge,               -- :: Event a -> Event a -> Event a,    infixl 6
     merge,                -- :: Event a -> Event a -> Event a,    infixl 6
     mergeBy,              -- :: (a -> a -> a) -> Event a -> Event a -> Event a
-    mapMerge,             -- :: (a -> c) -> (b -> c) -> (a -> b -> c) 
+    mapMerge,             -- :: (a -> c) -> (b -> c) -> (a -> b -> c)
                           --    -> Event a -> Event b -> Event c
     mergeEvents,          -- :: [Event a] -> Event a
     catEvents,            -- :: [Event a] -> Event [a]
@@ -427,10 +427,6 @@ module FRP.Yampa (
     ( # ),                -- :: (a -> b) -> (b -> c) -> (a -> c),    infixl 9
     dup,                  -- :: a -> (a,a)
 
-    Source(..),
-    Sink(..),
-    Signal(..),
-
 ) where
 
 import Control.Arrow
@@ -447,7 +443,6 @@ import FRP.Yampa.Loop
 import FRP.Yampa.Miscellany (( # ), dup)
 import FRP.Yampa.Random
 import FRP.Yampa.Scan
-import FRP.Yampa.Signal
 import FRP.Yampa.Simulation
 import FRP.Yampa.Switches
 import FRP.Yampa.Time
