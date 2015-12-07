@@ -1,0 +1,17 @@
+name:                yampa-signals
+version:             0.10.4
+synopsis:            Sources, signals and sinks in Yampa
+homepage:            http://github.com/ivanperez-keera/Yampa
+license:             BSD3
+license-file:        LICENSE
+author:              Ivan Perez
+maintainer:          ivan.perez@keera.co.uk
+category:            FRP
+build-type:          Simple
+cabal-version:       >=1.10
+
+library
+  exposed-modules:   FRP.Yampa.Signal
+  build-depends:       base >=4.7 && <5, Yampa
+  hs-source-dirs:      src
+  default-language:    Haskell2010
