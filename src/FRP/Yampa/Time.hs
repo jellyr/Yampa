@@ -19,12 +19,13 @@ module FRP.Yampa.Time (
 
 import Control.Arrow
 
+import FRP.Yampa.Basic        (constant)
+import FRP.Yampa.Diagnostics  (usrErr)
+import FRP.Yampa.Integration  (integral)
 import FRP.Yampa.InternalCore ( SF(SF), SF'(SF')
                               , sfTF,   sfTF'
                               , Time,   DTime
                               )
-import FRP.Yampa.Basic (constant)
-import FRP.Yampa.Integration (integral)
 
 -- | Outputs the time passed since the signal function instance was started.
 localTime :: SF a Time
@@ -50,9 +51,9 @@ timeTransformF transform sf = SF' tf
  where tf dt a = let dt'      = transform dt
                      (sf', b) = (sfTF' sf) dt' a
                      sf''     = timeTransformF transform sf'
-                 in if dt' <= 0 
-			  then error "The time cannot be negative"
-			  else (sf'', b)
+                 in if dt' <= 0
+                          then usrErr "AFRP" "timeTransform" "The time cannot be negative"
+                          else (sf'', b)
 
 -- Vim modeline
 -- vim:set tabstop=8 expandtab:
