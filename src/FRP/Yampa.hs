@@ -347,6 +347,7 @@ module FRP.Yampa (
                           --    -> col (SF b c)
                           --    -> SF (a, Event (col (SF b c) -> col (SF b c)))
                           --          (col c)
+                          --
 
     -- * Discrete to continuous-time signal functions
     -- ** Wave-form generation
@@ -388,7 +389,7 @@ module FRP.Yampa (
     imIntegral,           -- :: VectorSpace a s => a -> SF a a
 
     -- Temporarily hidden, but will eventually be made public.
-    -- iterFrom,          -- :: (a -> a -> DTime -> b -> b) -> b -> SF a b
+    iterFrom,          -- :: (a -> a -> DTime -> b -> b) -> b -> SF a b
 
     -- * Noise (random signal) sources and stochastic event sources
     noise,                -- :: noise :: (RandomGen g, Random b) =>

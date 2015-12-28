@@ -21,7 +21,7 @@ module FRP.Yampa.Integration (
     derivative,         -- :: VectorSpace a s => SF a a         -- Crude!
 
     -- Temporarily hidden, but will eventually be made public.
-    -- iterFrom,           -- :: (a -> a -> DTime -> b -> b) -> b -> SF a b
+    iterFrom,           -- :: (a -> a -> DTime -> b -> b) -> b -> SF a b
     impulseIntegral,
     count
 
