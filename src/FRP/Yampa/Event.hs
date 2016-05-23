@@ -78,7 +78,9 @@ module FRP.Yampa.Event where
 -- (==)     :: Event a -> Event a -> Bool
 -- (<=) :: Event a -> Event a -> Bool
 
+import Control.Applicative
 import Control.DeepSeq (NFData(..))
+import Data.Functor
 
 import FRP.Yampa.Diagnostics
 import FRP.Yampa.Forceable
@@ -123,50 +125,71 @@ noEventSnd :: (a, Event b) -> (a, Event c)
 noEventSnd (a, _) = (a, NoEvent)
 
 
-------------------------------------------------------------------------------
--- Eq instance
-------------------------------------------------------------------------------
-
--- Right now, we could derive this instance. But that could possibly change.
-
+-- | Eq instance (equivalent to derived instance)
 instance Eq a => Eq (Event a) where
+    -- | Equal if both NoEvent or both Event carrying equal values.
     NoEvent   == NoEvent   = True
     (Event x) == (Event y) = x == y
     _         == _         = False
 
 
-------------------------------------------------------------------------------
--- Ord instance
-------------------------------------------------------------------------------
-
+-- | Ord instance (equivalent to derived instance)
 instance Ord a => Ord (Event a) where
+    -- | NoEvent is smaller than Event, Event x < Event y if x < y
     compare NoEvent   NoEvent   = EQ
     compare NoEvent   (Event _) = LT
     compare (Event _) NoEvent   = GT
     compare (Event x) (Event y) = compare x y
 
-
-------------------------------------------------------------------------------
--- Functor instance
-------------------------------------------------------------------------------
-
+-- | Functor instance (could be derived).
 instance Functor Event where
+    -- | Apply function to value carried by 'Event', if any.
     fmap _ NoEvent   = NoEvent
     fmap f (Event a) = Event (f a)
 
 
-------------------------------------------------------------------------------
--- Forceable instance
-------------------------------------------------------------------------------
+-- | Applicative instance (similar to 'Maybe').
+instance Applicative Event where
+    -- | Wrap a pure value in an 'Event'.
+    pure = Event
+    -- | If any value (function or arg) is 'NoEvent', everything is.
+    NoEvent <*> _ = NoEvent
+    Event f <*> x = f <$> x
 
+-- | Monad instance
+instance Monad Event where
+    -- | Combine events, return 'NoEvent' if any value in the
+    -- sequence is 'NoEvent'.
+    (Event x) >>= k = k x
+    NoEvent  >>= _  = NoEvent
+
+    (>>) = (*>)
+
+    -- | See 'pure'.
+    return          = pure
+    -- | Fail with 'NoEvent'.
+    fail _          = NoEvent
+
+
+-- | Alternative instance
+instance Alternative Event where
+    -- | An empty alternative carries no event, so it is ignored.
+    empty = NoEvent
+    -- | Merge favouring the left event ('NoEvent' only if both are
+    -- 'NoEvent').
+    NoEvent <|> r = r
+    l       <|> _ = l
+
+
+-- | Forceable instance
 instance Forceable a => Forceable (Event a) where
+    -- | Force an event by evaluating its argument.
     force ea@NoEvent   = ea
     force ea@(Event a) = force a `seq` ea
 
-------------------------------------------------------------------------------
--- NFData instance
-------------------------------------------------------------------------------
+-- | NFData instance
 instance NFData a => NFData (Event a) where
+    -- | Evaluate value carried by event.
     rnf NoEvent   = ()
     rnf (Event a) = rnf a `seq` ()
 
@@ -177,6 +200,7 @@ instance NFData a => NFData (Event a) where
 -- These utilities are to be considered strictly internal to AFRP for the
 -- time being.
 
+-- | Convert a maybe value into a event ('Event' is isomorphic to 'Maybe').
 maybeToEvent :: Maybe a -> Event a
 maybeToEvent Nothing  = NoEvent
 maybeToEvent (Just a) = Event a
@@ -211,11 +235,17 @@ isNoEvent = not . isEvent
 ------------------------------------------------------------------------------
 
 -- | Tags an (occurring) event with a value ("replacing" the old value).
+--
+-- Applicative-based definition:
+--  tag = ($>)
 tag :: Event a -> b -> Event b
 e `tag` b = fmap (const b) e
 
 -- | Tags an (occurring) event with a value ("replacing" the old value). Same
 -- as 'tag' with the arguments swapped.
+--
+-- Applicative-based definition:
+-- tagWith = (<$)
 tagWith :: b -> Event a -> Event b
 tagWith = flip tag
 
@@ -238,12 +268,12 @@ e `attach` b = fmap (\a -> (a, b)) e
 
 -- | Left-biased event merge (always prefer left event, if present).
 lMerge :: Event a -> Event a -> Event a
-le `lMerge` re = event re Event le
+lMerge = (<|>)
 
 
 -- | Right-biased event merge (always prefer right event, if present).
 rMerge :: Event a -> Event a -> Event a
-le `rMerge` re = event le Event re
+rMerge = flip (<|>)
 
 
 -- | Unbiased event merge: simultaneous occurrence is an error.
@@ -252,6 +282,9 @@ merge = mergeBy (usrErr "AFRP" "merge" "Simultaneous event occurrence.")
 
 
 -- | Event merge parameterized by a conflict resolution function.
+--
+-- Applicative-based definition:
+-- mergeBy f re le = (f <$> re <*> le) <|> re <|> le
 mergeBy :: (a -> a -> a) -> Event a -> Event a -> Event a
 mergeBy _       NoEvent      NoEvent      = NoEvent
 mergeBy _       le@(Event _) NoEvent      = le
