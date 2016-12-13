@@ -146,7 +146,7 @@ sfMkInv sf = SF {sfTF = ...}
 ------------------------------------------------------------------------------
 
 -- | Event source that never occurs.
-{-# ANN never "HLint: ignore Use const" #-}
+-- {-# ANN never "HLint: ignore Use const" #-}
 never :: SF a (Event b)
 never = SF {sfTF = \_ -> (sfNever, NoEvent)}
 

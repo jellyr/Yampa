@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, Rank2Types, CPP         #-}
+{-# LANGUAGE GADTs, Rank2Types, CPP #-}
 
 -- Module      :  FRP.Yampa.Basic
 -- Copyright   :  (c) Antony Courtney and Henrik Nilsson, Yale University, 2003
@@ -40,7 +40,7 @@ infixr 0 -->, >--, -=>, >=-
 identity :: SF a a
 identity = SF {sfTF = \a -> (sfId, a)}
 
-{-# ANN constant "HLint: ignore Use const" #-}
+-- {-# ANN constant "HLint: ignore Use const" #-}
 -- | Identity: constant b = arr (const b)
 --
 -- Using 'constant' is preferred over lifting const, since the arrow combinators
@@ -83,7 +83,7 @@ f -=> (SF {sfTF = tf10}) =
 --
 -- Applies a transformation 'f' only to the first input value at
 -- time zero.
-{-# ANN (>=-) "HLint: ignore Avoid lambda" #-}
+-- {-# ANN (>=-) "HLint: ignore Avoid lambda" #-}
 (>=-) :: (a -> a) -> SF a b -> SF a b
 f >=- (SF {sfTF = tf10}) = SF {sfTF = \a0 -> tf10 (f a0)}
 
